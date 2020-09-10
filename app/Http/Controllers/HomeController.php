@@ -25,11 +25,19 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
+        // dd($request->all());
         $applicants = ApplicationForm::query();
-        $q = $request->q ?? '';
-        if($request->q) {
-            $applicants = $applicants->where('applicant_name', 'LIKE', '%'.$request->q.'%');
+        $q = '';
+        if($request->filter == 'region') {
+            $applicants = $applicants->where('region', $request->region);
+            // dd('pp');
+        }else{
+            $q = $request->q ?? '';
+            if($request->q) {
+                $applicants = $applicants->where('applicant_name', 'LIKE', '%'.$request->q.'%');
+            }
         }
+
         $applicants = $applicants->latest()->paginate(50);
         return view('home', compact('applicants', 'q'));
     }
@@ -48,10 +56,10 @@ class HomeController extends Controller
     {
 
         $data = $request->validate([
-            'applicant_name' => 'required', 'dob' => 'required', 'gender' => 'required', 'applicant_contact_number' => 'required', 'applicant_email' => 'required',
+            'applicant_name' => 'required', 'dob' => 'required', 'age' => 'required', 'gender' => 'required', 'applicant_contact_number' => 'required', 'applicant_email' => 'required',
             'district' => 'required', 'region' => 'required', 'business_name' => 'required', 'business_details' => 'required', 'business_sector' => 'required',
             'business_registered' => 'required', 'business_location' => 'required', 'business_status' => 'required', 'training_received' => 'required', 'neip_applied' => 'required',
-            'supervising_officer_name' => 'required', 'supervising_officer_number' => 'required', 'supervising_officer_email' => 'required', 'supervising_officer_desigation' => 'required'
+            'supervising_officer_name' => '', 'supervising_officer_number' => '', 'supervising_officer_email' => '', 'supervising_officer_desigation' => ''
         ]);
         $data = array_merge($data, [
             'uuid' => (string) Str::uuid(),
